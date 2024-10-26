@@ -251,8 +251,8 @@ pub fn create_table_braces(
         }
 
         TableType::SingleLine => ContainedSpan::new(
-            fmt_symbol!(ctx, start_brace, "{ ", shape),
-            fmt_symbol!(ctx, end_brace, " }", shape),
+            fmt_symbol!(ctx, start_brace, "{", shape),
+            fmt_symbol!(ctx, end_brace, "}", shape),
         ),
 
         TableType::Empty => {
@@ -300,7 +300,7 @@ where
 
     let (start_brace, end_brace) = braces.tokens();
     let braces = create_table_braces(ctx, start_brace, end_brace, table_type, shape);
-    let mut shape = shape + 2; // 2 = "{ "
+    let mut shape = shape + 1; // 1 = "{"
 
     let mut current_fields = fields.pairs().peekable();
     let mut fields = Punctuated::new();
