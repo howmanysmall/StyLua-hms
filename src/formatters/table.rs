@@ -34,6 +34,8 @@ pub enum TableType {
     Empty,
 }
 
+const MULTI_LINE_SEPARATOR: &str = ";";
+
 /// Formats an Expression value part of a k,v field pair
 fn format_field_expression_value(
     ctx: &Context,
@@ -339,6 +341,7 @@ pub fn format_multiline_table<T, U>(
     fields: &Punctuated<T>,
     formatter: U,
     shape: Shape,
+    is_type: bool,
 ) -> (ContainedSpan, Punctuated<T>)
 where
     T: std::fmt::Display + Node,
@@ -393,11 +396,27 @@ where
         // Add newline trivia to the end of the symbol
         trailing_trivia.push(create_newline_trivia(&ctx));
 
-        let symbol = match punctuation {
-            Some(punctuation) => fmt_symbol!(&ctx, punctuation, ",", shape),
-            None => TokenReference::symbol(",").unwrap(),
+        let symbol: TokenReference;
+        match is_type {
+            true => {
+                symbol = match punctuation {
+                    Some(punctuation) => fmt_symbol!(&ctx, punctuation, ",", shape),
+                    None => TokenReference::symbol(",").unwrap(),
+                }
+                .update_trailing_trivia(FormatTriviaType::Append(trailing_trivia));
+            }
+
+            false => {
+                symbol = match punctuation {
+                    Some(punctuation) => {
+                        fmt_symbol!(&ctx, punctuation, MULTI_LINE_SEPARATOR, shape)
+                    }
+                    None => TokenReference::symbol(MULTI_LINE_SEPARATOR).unwrap(),
+                }
+                .update_trailing_trivia(FormatTriviaType::Append(trailing_trivia));
+            }
         }
-        .update_trailing_trivia(FormatTriviaType::Append(trailing_trivia));
+
         let formatted_punctuation = Some(symbol);
 
         fields.push(Pair::new(formatted_field, formatted_punctuation))
@@ -550,6 +569,7 @@ pub fn format_table_constructor(
             table_constructor.fields(),
             format_field,
             shape,
+            false,
         ),
     };
 
