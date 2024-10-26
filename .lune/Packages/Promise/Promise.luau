@@ -131,13 +131,10 @@ do
 		}
 
 		for _, runtimeError in self:getErrorChain() do
-			table.insert(
-				errorStrings,
-				table.concat({
-					runtimeError.trace or runtimeError.error;
-					runtimeError.context;
-				}, "\n")
-			)
+			table.insert(errorStrings, table.concat({
+				runtimeError.trace or runtimeError.error;
+				runtimeError.context;
+			}, "\n"))
 		end
 
 		return table.concat(errorStrings, "\n")
@@ -1503,15 +1500,13 @@ local function Finally(self, traceback, finallyHandler)
 				if Promise.Is(callbackReturn) then
 					handlerPromise = callbackReturn
 
-					callbackReturn
-						:Finally(function(status)
-							if status ~= Promise.Status.Rejected then
-								resolve(self)
-							end
-						end)
-						:Catch(function(...)
-							reject(...)
-						end)
+					callbackReturn:Finally(function(status)
+						if status ~= Promise.Status.Rejected then
+							resolve(self)
+						end
+					end):Catch(function(...)
+						reject(...)
+					end)
 				else
 					resolve(self)
 				end

@@ -112,7 +112,7 @@ PathFileSystem.writeDir = PathFileSystem.WriteDirectory
 -- function PathFileSystem.Join(...: Path.AsPath) end
 
 function PathFileSystem.GetScriptPath(): Path
-	local path = string.match(debug.info(2, "s"), '%[string "([^"]*)"%]')
+	local path = string.match(debug.info(2, "s"), "%[string \"([^\"]*)\"%]")
 	if not path then
 		error("Failed to get script path")
 	end

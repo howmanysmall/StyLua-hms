@@ -298,8 +298,8 @@ fn function_args_multiline_heuristic(
                 ) {
                     // If the argument is complex (spans multiple lines), then we will immediately
                     // exit and span multiline - it is most likely too complex to keep going forward.
-                    // if is_complex_arg(expression) && arguments.len() > 1 {
-                    if is_complex_arg(expression) && arguments.len() > usize::MAX {
+                    if is_complex_arg(expression) && arguments.len() > 50 {
+                        // was originally `arguments.len() > 1` by the way
                         return true;
                     }
                 }
@@ -1009,9 +1009,9 @@ pub fn format_function_call(
             }
         }
 
-        // if call_count > 1 {
         // gross hack to just disable this lol
         if false {
+            // if call_count > 1 {
             // Check if either a), we are surpassing the column width
             // Or b), one of the INTERNAL (not the last call) method call's arguments is multiline [function/table]
 

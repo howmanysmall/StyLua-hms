@@ -2,7 +2,7 @@
 --!strict
 --[=[ lunar
 	about = "Validates the existence of custom packages."
-	args = ""
+	args = "[-d,--destroy]"
 ]=]
 
 local Execute = require("@utilities/Execute")
@@ -13,6 +13,16 @@ local process = require("@lune/process")
 
 local Path = PathFileSystem.Path
 local console = LuauPolyfill.console
+
+local arguments = table.clone(process.args)
+local DESTROY_MODE = (function()
+	local index = table.find(arguments, "-d") or table.find(arguments, "--destroy")
+	if index then
+		table.remove(arguments, index)
+		return true
+	end
+	return false
+end)()
 
 local TARGET_FOLDER = Path.new("target")
 local RELEASE_FOLDER = TARGET_FOLDER:join("release")
@@ -78,6 +88,6 @@ PathFileSystem.WriteFile(TABLE_FILE, GetInverse(fileSource, captureType))
 BuildStyLua2(if captureType == ";" then "stylua2Roact" else "stylua2")
 PathFileSystem.WriteFile(TABLE_FILE, fileSource)
 
-if PathFileSystem.IsDirectorySafe(RELEASE_FOLDER) then
+if DESTROY_MODE and PathFileSystem.IsDirectorySafe(RELEASE_FOLDER) then
 	PathFileSystem.RemoveDirectory(RELEASE_FOLDER)
 end
