@@ -22,7 +22,7 @@ function AssertableResult:Assert()
 	return self
 end
 
-local function Execute(command: { string }, options: process.SpawnOptions?): AssertableResult
+local function Execute(command: {string}, options: process.SpawnOptions?): AssertableResult
 	local binary = command[1]
 
 	local arguments = table.clone(command)
