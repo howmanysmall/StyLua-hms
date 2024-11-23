@@ -300,7 +300,7 @@ fn function_args_multiline_heuristic(
                     // exit and span multiline - it is most likely too complex to keep going forward.
                     // this will change if we newline for stuff like long React.createElement children funnies
                     //                               > 3 is too much i believe...
-                    if is_complex_arg(expression) && arguments.len() > 1 {
+                    if is_complex_arg(expression) && arguments.len() > 50 {
                         return true;
                     }
                 }
@@ -1010,10 +1010,8 @@ pub fn format_function_call(
             }
         }
 
-        // kinda makes it ugly, ngl
         // if false {
         if call_count > 1 {
-            // working (patriot validated)
             // Check if either a), we are surpassing the column width
             // Or b), one of the INTERNAL (not the last call) method call's arguments is multiline [function/table]
 

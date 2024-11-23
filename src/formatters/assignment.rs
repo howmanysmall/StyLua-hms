@@ -172,8 +172,8 @@ fn attempt_assignment_tactics(
     // If there is, we should put it on multiple lines
 
     // in my other version, `if false` is the default
-    // if false {
-    if expressions.len() > 1 {
+    // if expressions.len() > 1 {
+    if false {
         // First try hanging at the equal token, using an infinite width, to see if its enough
         let hanging_equal_token = hang_equal_token(ctx, &equal_token, shape, true);
         let hanging_shape = shape.reset().increment_additional_indent();
