@@ -1,0 +1,11 @@
+{
+	"aliases": {
+		"packages": ".lune/Packages",
+		"utilities": ".lune/Utilities"
+	},
+	"languageMode": "strict",
+	"lint": {
+		"*": true
+	},
+	"globals": []
+}
