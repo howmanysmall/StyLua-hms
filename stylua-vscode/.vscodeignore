@@ -9,5 +9,8 @@ webpack.config.js
 vsc-extension-quickstart.md
 **/tsconfig.json
 **/.eslintrc.json
+**/.eslintrc
 **/*.map
 **/*.ts
+**/biome.json
+**/biome.jsonc

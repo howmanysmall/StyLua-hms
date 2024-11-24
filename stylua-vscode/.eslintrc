@@ -1,0 +1,62 @@
+{
+	"root": true,
+	"ignorePatterns": ["out", "dist", "**/*.d.ts"],
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"ecmaVersion": 6,
+		"sourceType": "module"
+	},
+	"plugins": ["@typescript-eslint", "prettier", "unicorn", "perfectionist", "regexp"],
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:prettier/recommended",
+		"plugin:unicorn/recommended",
+		"plugin:perfectionist/recommended-natural",
+		"plugin:regexp/recommended"
+	],
+
+	"rules": {
+		"prettier/prettier": [
+			"warn",
+			{
+				"semi": true,
+				"trailingComma": "all",
+				"singleQuote": false,
+				"printWidth": 120,
+				"tabWidth": 4,
+				"useTabs": true,
+				"endOfLine": "auto"
+			}
+		],
+
+		"no-constant-condition": "off",
+		"no-inner-declarations": "off",
+
+		"unicorn/prefer-node-protocol": "off",
+		"unicorn/no-new-array": "off",
+
+		"perfectionist/sort-objects": [
+			"error",
+			{
+				"order": "asc",
+				"type": "natural"
+			}
+		],
+		"perfectionist/sort-named-imports": [
+			"error",
+			{
+				"order": "asc",
+				"type": "natural"
+			}
+		],
+		"perfectionist/sort-imports": [
+			"error",
+			{
+				"order": "asc",
+				"type": "natural"
+			}
+		],
+		"perfectionist/sort-classes": "off"
+	}
+}
