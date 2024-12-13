@@ -24,7 +24,12 @@ local DESTROY_MODE = (function()
 	return false
 end)()
 
+local ON_ARM64 = process.arch == "aarch64"
 local TARGET_FOLDER = Path.new("target")
+if ON_ARM64 then
+	TARGET_FOLDER = TARGET_FOLDER:join("aarch64-pc-windows-msvc")
+end
+
 local RELEASE_FOLDER = TARGET_FOLDER:join("release")
 local RELEASES_FOLDER = TARGET_FOLDER:join("releases")
 
@@ -36,7 +41,12 @@ local BASE_STRING = "const MULTI_LINE_SEPARATOR: &str = %q;"
 local SEPARATOR_PATTERN = RegEx.new(string.format(BASE_STRING, "(;|,)"))
 
 local function BuildStyLua2(fileName: string)
-	Execute({"cargo", "b", "--all-features", "--release"}):Assert()
+	local command = {"cargo", "b", "--all-features", "--release", "-v"}
+	if ON_ARM64 then
+		table.insert(command, "--target")
+		table.insert(command, "aarch64-pc-windows-msvc")
+	end
+	Execute(command):Assert()
 
 	if not PathFileSystem.IsFileSafe(RELEASE_FILE) then
 		console.error("Release file not found?")
