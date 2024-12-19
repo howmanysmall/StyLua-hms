@@ -25,15 +25,16 @@ local DESTROY_MODE = (function()
 end)()
 
 local ON_ARM64 = process.arch == "aarch64"
+local ON_WINDOWS = process.os == "windows"
 local TARGET_FOLDER = Path.new("target")
 if ON_ARM64 then
-	TARGET_FOLDER = TARGET_FOLDER:join("aarch64-pc-windows-msvc")
+	TARGET_FOLDER = TARGET_FOLDER:join(if ON_WINDOWS then "aarch64-pc-windows-msvc" else "aarch64-unknown-linux-gnu")
 end
 
 local RELEASE_FOLDER = TARGET_FOLDER:join("release")
 local RELEASES_FOLDER = TARGET_FOLDER:join("releases")
 
-local RELEASE_FILE = RELEASE_FOLDER:join(if process.os == "windows" then "stylua.exe" else "stylua")
+local RELEASE_FILE = RELEASE_FOLDER:join(if ON_WINDOWS then "stylua.exe" else "stylua")
 
 local TABLE_FILE = Path.new("src"):join("formatters"):join("table.rs")
 
@@ -44,7 +45,7 @@ local function BuildStyLua2(fileName: string)
 	local command = {"cargo", "b", "--all-features", "--release", "-v"}
 	if ON_ARM64 then
 		table.insert(command, "--target")
-		table.insert(command, "aarch64-pc-windows-msvc")
+		table.insert(command, if ON_WINDOWS then "aarch64-pc-windows-msvc" else "aarch64-unknown-linux-gnu")
 	end
 	Execute(command):Assert()
 
@@ -59,7 +60,7 @@ local function BuildStyLua2(fileName: string)
 
 	PathFileSystem.Move(
 		RELEASE_FILE,
-		RELEASES_FOLDER:join(if process.os == "windows" then `{fileName}.exe` else fileName),
+		RELEASES_FOLDER:join(if ON_WINDOWS then `{fileName}.exe` else fileName),
 		true
 	)
 end
