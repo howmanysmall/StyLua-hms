@@ -24,12 +24,12 @@ local DESTROY_MODE = (function()
 	return false
 end)()
 
-local ON_ARM64 = process.arch == "aarch64"
+-- local ON_ARM64 = process.arch == "aarch64"
 local ON_WINDOWS = process.os == "windows"
 local TARGET_FOLDER = Path.new("target")
-if ON_ARM64 then
-	TARGET_FOLDER = TARGET_FOLDER:join(if ON_WINDOWS then "aarch64-pc-windows-msvc" else "aarch64-unknown-linux-gnu")
-end
+-- if ON_ARM64 then
+-- 	TARGET_FOLDER = TARGET_FOLDER:join(if ON_WINDOWS then "aarch64-pc-windows-msvc" else "aarch64-unknown-linux-gnu")
+-- end
 
 local RELEASE_FOLDER = TARGET_FOLDER:join("release")
 local RELEASES_FOLDER = TARGET_FOLDER:join("releases")

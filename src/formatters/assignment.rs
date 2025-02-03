@@ -160,7 +160,7 @@ fn prevent_equals_hanging(expression: &Expression) -> bool {
     }
 }
 
-const MAX_EXPRESSIONS: usize = usize::MAX;
+const MAX_EXPRESSIONS: usize = 1;
 
 /// Attempts different formatting tactics on an expression list being assigned (`= foo, bar`), to find the best
 /// formatting output.

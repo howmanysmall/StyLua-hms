@@ -178,7 +178,7 @@ impl ArgumentState {
     }
 }
 
-const MAX_ARGUMENTS: usize = 50;
+const MAX_ARGUMENTS: usize = 1;
 
 /// Applies heuristics to determine whether a parenthesised function call should be expanded onto multiple lines.
 /// These heuristics are subject to change.
