@@ -45,10 +45,10 @@ local SEPARATOR_PATTERN = RegEx.new(string.format(BASE_STRING, "(;|,)"))
 
 local function BuildStyLua2(fileName: string)
 	local command = {"cargo", "b", "--all-features", "--release", "-v"}
---	if ON_ARM64 then
---		table.insert(command, "--target")
---		table.insert(command, if ON_WINDOWS then "aarch64-pc-windows-msvc" else "aarch64-unknown-linux-gnu")
---	end
+	--	if ON_ARM64 then
+	--		table.insert(command, "--target")
+	--		table.insert(command, if ON_WINDOWS then "aarch64-pc-windows-msvc" else "aarch64-unknown-linux-gnu")
+	--	end
 	Execute(command):Assert()
 
 	if not PathFileSystem.IsFileSafe(RELEASE_FILE) then
@@ -60,11 +60,7 @@ local function BuildStyLua2(fileName: string)
 		PathFileSystem.WriteDirectory(RELEASES_FOLDER)
 	end
 
-	PathFileSystem.Move(
-		RELEASE_FILE,
-		RELEASES_FOLDER:join(if ON_WINDOWS then `{fileName}.exe` else fileName),
-		true
-	)
+	PathFileSystem.Move(RELEASE_FILE, RELEASES_FOLDER:join(if ON_WINDOWS then `{fileName}.exe` else fileName), true)
 end
 local function GetInverse(fileSource: string, separator: ";" | ",")
 	return SEPARATOR_PATTERN:replace(fileSource, string.format(BASE_STRING, if separator == ";" then "," else ";"))
@@ -99,8 +95,7 @@ if not captureMatch then
 	return
 end
 
-local function DetermineBuildType(): ("stylua2" | "stylua2Roact", "hms" | "dg")
-end
+local function DetermineBuildType(): ("stylua2" | "stylua2Roact", "hms" | "dg") end
 
 local captureType: ";" | "," = captureMatch.text
 BuildStyLua2(if captureType == ";" then "stylua2" else "stylua2Roact")
