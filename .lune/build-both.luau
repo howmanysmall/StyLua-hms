@@ -10,7 +10,6 @@ local LuauPolyfill = require("@packages/LuauPolyfill")
 local PathFileSystem = require("@packages/PathFileSystem")
 local RegEx = require("@lune/regex")
 local process = require("@lune/process")
-local task = require("@lune/task")
 
 local Path = PathFileSystem.Path
 local console = LuauPolyfill.console
