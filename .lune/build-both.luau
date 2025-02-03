@@ -280,6 +280,7 @@ local function Build(buildType: BuildType, jobType: JobType, tableFileSource: st
 	BuildStyLua2(if buildType == "stylua2" then "stylua2Roact" else "stylua2", jobType)
 	-- print(`BuildStyLua2({if buildType == "stylua2" then "stylua2Roact" else "stylua2"}, {jobType})`)
 	-- task.wait(2)
+	PathFileSystem.WriteFile(TABLE_FILE, tableFileSource)
 end
 
 local buildData = DetermineBuildType()
