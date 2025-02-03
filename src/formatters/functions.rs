@@ -298,7 +298,8 @@ fn function_args_multiline_heuristic(
                 ) {
                     // If the argument is complex (spans multiple lines), then we will immediately
                     // exit and span multiline - it is most likely too complex to keep going forward.
-                    if is_complex_arg(expression) && arguments.len() > 1 {
+                    //                               > 3 is too much i believe...
+                    if is_complex_arg(expression) && arguments.len() > 50 {
                         return true;
                     }
                 }
