@@ -91,7 +91,7 @@ return function()
 		Warn(indent() .. message)
 	end
 
-	function console.error(content, ...)
+	function console.error(content: unknown, ...)
 		-- JS' `console.error` doesn't interrupt execution like Lua's `error`,
 		-- which is more similar to throwing an exception in JS.
 		local message

@@ -10,6 +10,7 @@ local LuauPolyfill = require("@packages/LuauPolyfill")
 local PathFileSystem = require("@packages/PathFileSystem")
 local RegEx = require("@lune/regex")
 local process = require("@lune/process")
+local task = require("@lune/task")
 
 local Path = PathFileSystem.Path
 local console = LuauPolyfill.console
@@ -40,10 +41,13 @@ local FORMATTERS = Path.new("src"):join("formatters")
 local TABLE_FILE = FORMATTERS:join("table.rs")
 local ASSIGNMENT = FORMATTERS:join("assignment.rs")
 
-local BASE_STRING = "const MULTI_LINE_SEPARATOR: &str = %q;"
-local SEPARATOR_PATTERN = RegEx.new(string.format(BASE_STRING, "(;|,)"))
+local SEPARATOR_STRING = "const MULTI_LINE_SEPARATOR: &str = %q;"
+local SEPARATOR_PATTERN = RegEx.new(string.format(SEPARATOR_STRING, "(;|,)"))
 
-local function BuildStyLua2(fileName: string)
+local EXPRESSIONS_STRING = "const MAX_EXPRESSIONS: usize = %*;"
+local EXPRESSIONS_PATTERN = RegEx.new(string.format(EXPRESSIONS_STRING, "(\\d|usize::MAX)"))
+
+local function BuildStyLua2(fileName: string, jobType: JobType)
 	local command = {"cargo", "b", "--all-features", "--release", "-v"}
 	--	if ON_ARM64 then
 	--		table.insert(command, "--target")
@@ -62,8 +66,17 @@ local function BuildStyLua2(fileName: string)
 
 	PathFileSystem.Move(RELEASE_FILE, RELEASES_FOLDER:join(if ON_WINDOWS then `{fileName}.exe` else fileName), true)
 end
-local function GetInverse(fileSource: string, separator: ";" | ",")
-	return SEPARATOR_PATTERN:replace(fileSource, string.format(BASE_STRING, if separator == ";" then "," else ";"))
+local function GetTableInverse(fileSource: string, buildType: BuildType)
+	return SEPARATOR_PATTERN:replace(
+		fileSource,
+		string.format(SEPARATOR_STRING, if buildType == "stylua2" then "," else ";")
+	)
+end
+local function GetAssignmentInverse(fileSource: string, jobType: JobType)
+	return EXPRESSIONS_PATTERN:replace(
+		fileSource,
+		string.format(EXPRESSIONS_STRING, if jobType == "dg" then "usize::MAX" else "1")
+	)
 end
 
 if not PathFileSystem.IsFileSafe(TABLE_FILE) then
@@ -75,33 +88,75 @@ if not PathFileSystem.IsFileSafe(ASSIGNMENT) then
 	process.exit(1)
 end
 
-local fileSource = PathFileSystem.ReadFile(TABLE_FILE)
-if not SEPARATOR_PATTERN:isMatch(fileSource) then
-	console.warn("Multi-line separator not found")
-	process.exit(1)
+type BuildType = "stylua2" | "stylua2Roact"
+type JobType = "hms" | "dg"
+
+local function DetermineBuildType(): (BuildType, JobType, string, string)
+	local tableFileSource = PathFileSystem.ReadFile(TABLE_FILE)
+	local assignmentFileSource = PathFileSystem.ReadFile(ASSIGNMENT)
+
+	if not SEPARATOR_PATTERN:isMatch(tableFileSource) then
+		console.warn("Multi-line separator not found")
+		process.exit(1)
+	end
+	local separatorCapture = SEPARATOR_PATTERN:captures(tableFileSource)
+	if not separatorCapture then
+		console.warn("Failed to capture multi-line separator?")
+		process.exit(1)
+		return "stylua2", "hms", "", ""
+	end
+	local separatorCaptureMatch = separatorCapture:get(1)
+	if not separatorCaptureMatch then
+		console.warn("Failed to capture multi-line separator type?")
+		process.exit(1)
+		return "stylua2", "hms", "", ""
+	end
+
+	if not EXPRESSIONS_PATTERN:isMatch(assignmentFileSource) then
+		console.warn("Max expressions not found")
+		process.exit(1)
+	end
+	local expressionsCapture = EXPRESSIONS_PATTERN:captures(assignmentFileSource)
+	if not expressionsCapture then
+		console.warn("Failed to capture max expressions?")
+		process.exit(1)
+		return "stylua2", "hms", "", ""
+	end
+	local expressionsCaptureMatch = expressionsCapture:get(1)
+	if not expressionsCaptureMatch then
+		console.warn("Failed to capture max expressions type?")
+		process.exit(1)
+		return "stylua2", "hms", "", ""
+	end
+
+	local captureType: ";" | "," = separatorCaptureMatch.text
+	local expression: "1" | "usize::MAX" = expressionsCaptureMatch.text
+
+	local buildType: BuildType = if captureType == ";" then "stylua2" else "stylua2Roact"
+	local jobType: JobType = if expression == "usize::MAX" then "hms" else "dg"
+
+	return buildType, jobType, tableFileSource, assignmentFileSource
 end
 
-local capture = SEPARATOR_PATTERN:captures(fileSource)
-if not capture then
-	console.warn("Failed to capture multi-line separator?")
-	process.exit(1)
-	return
+local function Build(buildType: BuildType, jobType: JobType, tableFileSource: string, assignmentFileSource: string)
+	print(`BuildStyLua2({buildType}, {jobType})`)
+	-- BuildStyLua2(buildType, jobType)
+	task.wait(2)
+	PathFileSystem.WriteFile(TABLE_FILE, GetTableInverse(tableFileSource, buildType))
+
+	print(`BuildStyLua2({if buildType == "stylua2" then "stylua2Roact" else "stylua2"}, {jobType})`)
+	task.wait(2)
+	-- BuildStyLua2(if buildType == "stylua2" then "stylua2Roact" else "stylua2", jobType)
 end
 
-local captureMatch = capture:get(1)
-if not captureMatch then
-	console.warn("Failed to capture multi-line separator type?")
-	process.exit(1)
-	return
-end
+local buildType: BuildType, jobType: JobType, tableFileSource, assignmentFileSource = DetermineBuildType()
 
-local function DetermineBuildType(): ("stylua2" | "stylua2Roact", "hms" | "dg") end
+Build(buildType, jobType, tableFileSource, assignmentFileSource)
+PathFileSystem.WriteFile(ASSIGNMENT, GetAssignmentInverse(assignmentFileSource, jobType))
+Build(buildType, if jobType == "dg" then "hms" else "dg", tableFileSource, assignmentFileSource)
 
-local captureType: ";" | "," = captureMatch.text
-BuildStyLua2(if captureType == ";" then "stylua2" else "stylua2Roact")
-PathFileSystem.WriteFile(TABLE_FILE, GetInverse(fileSource, captureType))
-BuildStyLua2(if captureType == ";" then "stylua2Roact" else "stylua2")
-PathFileSystem.WriteFile(TABLE_FILE, fileSource)
+PathFileSystem.WriteFile(TABLE_FILE, tableFileSource)
+PathFileSystem.WriteFile(ASSIGNMENT, assignmentFileSource)
 
 if DESTROY_MODE and PathFileSystem.IsDirectorySafe(RELEASE_FOLDER) then
 	PathFileSystem.RemoveDirectory(RELEASE_FOLDER)

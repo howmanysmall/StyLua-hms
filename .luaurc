@@ -1,5 +1,6 @@
 {
 	"aliases": {
+		"lune": "~/.lune/.typedefs/0.8.9",
 		"packages": ".lune/Packages",
 		"utilities": ".lune/Utilities"
 	},

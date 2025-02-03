@@ -34,7 +34,7 @@ local getObjectTag
 --[[
  * Used to print values in error messages.
  ]]
-local function inspect(value, options: InspectOptions?): string
+local function inspect(value: any, options: InspectOptions?): string
 	local inspectOptions: InspectOptions = options or {depth = DEFAULT_RECURSIVE_DEPTH}
 	local depth = inspectOptions.depth or DEFAULT_RECURSIVE_DEPTH
 	inspectOptions.depth = if depth >= 0 then depth else DEFAULT_RECURSIVE_DEPTH
