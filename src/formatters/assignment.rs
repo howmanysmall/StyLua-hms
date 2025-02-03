@@ -160,6 +160,8 @@ fn prevent_equals_hanging(expression: &Expression) -> bool {
     }
 }
 
+const MAX_EXPRESSIONS: usize = usize::MAX;
+
 /// Attempts different formatting tactics on an expression list being assigned (`= foo, bar`), to find the best
 /// formatting output.
 fn attempt_assignment_tactics(
@@ -173,7 +175,7 @@ fn attempt_assignment_tactics(
 
     // in my other version, `if false` is the default
     // if expressions.len() > 1 {
-    if false {
+    if expressions.len() > MAX_EXPRESSIONS {
         // First try hanging at the equal token, using an infinite width, to see if its enough
         let hanging_equal_token = hang_equal_token(ctx, &equal_token, shape, true);
         let hanging_shape = shape.reset().increment_additional_indent();

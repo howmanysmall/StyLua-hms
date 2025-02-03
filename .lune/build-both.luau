@@ -36,17 +36,19 @@ local RELEASES_FOLDER = TARGET_FOLDER:join("releases")
 
 local RELEASE_FILE = RELEASE_FOLDER:join(if ON_WINDOWS then "stylua.exe" else "stylua")
 
-local TABLE_FILE = Path.new("src"):join("formatters"):join("table.rs")
+local FORMATTERS = Path.new("src"):join("formatters")
+local TABLE_FILE = FORMATTERS:join("table.rs")
+local ASSIGNMENT = FORMATTERS:join("assignment.rs")
 
 local BASE_STRING = "const MULTI_LINE_SEPARATOR: &str = %q;"
 local SEPARATOR_PATTERN = RegEx.new(string.format(BASE_STRING, "(;|,)"))
 
 local function BuildStyLua2(fileName: string)
 	local command = {"cargo", "b", "--all-features", "--release", "-v"}
-	if ON_ARM64 then
-		table.insert(command, "--target")
-		table.insert(command, if ON_WINDOWS then "aarch64-pc-windows-msvc" else "aarch64-unknown-linux-gnu")
-	end
+--	if ON_ARM64 then
+--		table.insert(command, "--target")
+--		table.insert(command, if ON_WINDOWS then "aarch64-pc-windows-msvc" else "aarch64-unknown-linux-gnu")
+--	end
 	Execute(command):Assert()
 
 	if not PathFileSystem.IsFileSafe(RELEASE_FILE) then
@@ -72,6 +74,10 @@ if not PathFileSystem.IsFileSafe(TABLE_FILE) then
 	console.warn("table.rs file not found")
 	process.exit(1)
 end
+if not PathFileSystem.IsFileSafe(ASSIGNMENT) then
+	console.warn("assignment.rs file not found")
+	process.exit(1)
+end
 
 local fileSource = PathFileSystem.ReadFile(TABLE_FILE)
 if not SEPARATOR_PATTERN:isMatch(fileSource) then
@@ -91,6 +97,9 @@ if not captureMatch then
 	console.warn("Failed to capture multi-line separator type?")
 	process.exit(1)
 	return
+end
+
+local function DetermineBuildType(): ("stylua2" | "stylua2Roact", "hms" | "dg")
 end
 
 local captureType: ";" | "," = captureMatch.text
