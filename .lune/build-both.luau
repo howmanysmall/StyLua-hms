@@ -1,16 +1,17 @@
 --!optimize 2
 --!strict
 --[=[ lunar
-	about = "Builds both types of stylua2."
+	about = "Validates the existence of custom packages."
 	args = "[-d,--destroy]"
 ]=]
 
 local Execute = require("@utilities/Execute")
-local FileSystemUtilities = require("@utilities/FileSystemUtilities")
 local LuauPolyfill = require("@packages/LuauPolyfill")
+local PathFileSystem = require("@packages/PathFileSystem")
 local RegEx = require("@lune/regex")
 local process = require("@lune/process")
 
+local Path = PathFileSystem.Path
 local console = LuauPolyfill.console
 
 local arguments = {}
@@ -34,13 +35,14 @@ local DESTROY_MODE = (function()
 	return false
 end)()
 
-print(DESTROY_MODE)
-process.exit()
 -- local ON_ARM64 = process.arch == "aarch64"
 local ON_WINDOWS = process.os == "windows"
 local TARGET_FOLDER = Path.new("target")
+-- if ON_ARM64 then
+-- 	TARGET_FOLDER = TARGET_FOLDER:join(if ON_WINDOWS then "aarch64-pc-windows-msvc" else "aarch64-unknown-linux-gnu")
+-- end
 
-local RELEASE_FOLDER = FileSystemUtilities.Join(TARGET_FOLDER, "release")
+local RELEASE_FOLDER = TARGET_FOLDER:join("release")
 local RELEASES_FOLDER = TARGET_FOLDER:join("releases")
 
 local RELEASE_FILE = RELEASE_FOLDER:join(if ON_WINDOWS then "stylua.exe" else "stylua")
@@ -235,12 +237,12 @@ local function DetermineBuildType(): BuildData
 
 	local captureType: ";" | "," = separatorCaptureMatch.text
 	local expression: "1" | "usize::MAX" = expressionsCaptureMatch.text
-	local arguments = argumentsCaptureMatch.text
+	local argumentsText = argumentsCaptureMatch.text
 
 	local buildType: BuildType = if captureType == ";" then "stylua2" else "stylua2Roact"
 	local jobType: JobType = if expression == "usize::MAX" then "hms" else "dg"
 
-	local argumentsNumber = tonumber(arguments)
+	local argumentsNumber = tonumber(argumentsText)
 	if not argumentsNumber then
 		console.warn("Failed to capture max arguments number?")
 		process.exit(1)
@@ -258,11 +260,11 @@ local function DetermineBuildType(): BuildData
 
 	if argumentsNumber == 1 then
 		if jobType ~= "dg" then
-			arguments = "50"
+			argumentsText = "50"
 		end
 	elseif argumentsNumber == 50 then
 		if jobType ~= "hms" then
-			arguments = "1"
+			argumentsText = "1"
 		end
 	end
 
@@ -271,7 +273,7 @@ local function DetermineBuildType(): BuildData
 	return {
 		BuildType = buildType;
 		JobType = jobType;
-		MaxArguments = arguments;
+		MaxArguments = argumentsText;
 
 		TableFileSource = tableFileSource;
 		AssignmentFileSource = assignmentFileSource;
@@ -279,7 +281,7 @@ local function DetermineBuildType(): BuildData
 	}
 end
 
-local function Build(buildType: BuildType, jobType: JobType, tableFileSource: string, assignmentFileSource: string)
+local function Build(buildType: BuildType, jobType: JobType, tableFileSource: string, _assignmentFileSource: string)
 	BuildStyLua2(buildType, jobType)
 	-- print(`BuildStyLua2({buildType}, {jobType})`)
 	-- task.wait(2)

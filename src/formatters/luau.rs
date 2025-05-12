@@ -274,7 +274,7 @@ fn format_type_info_internal(
             access,
             type_info,
         } => {
-            const BRACKET_LEN: usize = "{ ".len();
+            const BRACKET_LEN: usize = "{".len();
 
             let (start_brace, end_brace) = braces.tokens().to_owned();
 
