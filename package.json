@@ -1,0 +1,17 @@
+{
+	"name": "stylua-hms-builder",
+	"private": true,
+	"type": "module",
+	"scripts": {},
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"@mitata/counters": "^0.0.8",
+		"@types/bun": "latest",
+		"concurrently": "^9.1.2",
+		"mitata": "^1.0.34",
+		"rimraf": "^6.0.1"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	}
+}

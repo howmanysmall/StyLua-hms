@@ -1,5 +1,7 @@
 {
 	"aliases": {
+		"errors": ".lune/Classes/Errors",
+		"functions": ".lune/Functions",
 		"lune": "~/.lune/.typedefs/0.9.3",
 		"packages": ".lune/Packages",
 		"utilities": ".lune/Utilities"

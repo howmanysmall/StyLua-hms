@@ -1,0 +1,13 @@
+destroy = false
+
+[builds.linux]
+aarch64 = true
+x86_64 = true
+
+[builds.macos]
+aarch64 = true
+x86_64 = true
+
+[builds.windows]
+aarch64 = true
+x86_64 = true

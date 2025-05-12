@@ -1,0 +1,17 @@
+{
+	"builds": {
+		"linux": {
+			"aarch64": false,
+			"x86_64": false
+		},
+		"macos": {
+			"aarch64": true,
+			"x86_64": false
+		},
+		"windows": {
+			"aarch64": false,
+			"x86_64": true
+		}
+	},
+	"destroyAfterDone": false
+}
