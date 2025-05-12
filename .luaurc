@@ -1,0 +1,14 @@
+{
+	"aliases": {
+		"lune": "~/.lune/.typedefs/0.9.3",
+		"packages": ".lune/Packages",
+		"utilities": ".lune/Utilities"
+	},
+	"globals": [],
+	"languageMode": "strict",
+	"lint": {
+		"*": true
+	},
+	"lintErrors": true,
+	"typeErrors": true
+}
