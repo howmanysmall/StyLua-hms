@@ -2,10 +2,10 @@ use crate::{
     context::{
         create_function_definition_trivia, create_indent_trivia, create_newline_trivia, Context,
     },
-    fmt_op, fmt_symbol,
+    fmt_symbol,
     formatters::{
         assignment::hang_equal_token,
-        expression::{format_expression, format_var},
+        expression::format_expression,
         functions::format_function_body,
         general::{
             format_contained_punctuated_multiline, format_contained_span, format_punctuated,
@@ -26,8 +26,8 @@ use crate::{
 };
 use full_moon::ast::{
     luau::{
-        CompoundAssignment, CompoundOp, ExportedTypeDeclaration, ExportedTypeFunction,
-        GenericDeclaration, GenericDeclarationParameter, GenericParameterInfo, IndexedTypeInfo,
+        ExportedTypeDeclaration, ExportedTypeFunction, GenericDeclaration,
+        GenericDeclarationParameter, GenericParameterInfo, IndexedTypeInfo, LuauAttribute,
         TypeArgument, TypeAssertion, TypeDeclaration, TypeField, TypeFieldKey, TypeFunction,
         TypeInfo, TypeIntersection, TypeSpecifier, TypeUnion,
     },
@@ -36,40 +36,6 @@ use full_moon::ast::{
 use full_moon::ast::{punctuated::Punctuated, span::ContainedSpan};
 use full_moon::tokenizer::{Token, TokenReference, TokenType};
 use std::boxed::Box;
-
-pub fn format_compound_op(ctx: &Context, compound_op: &CompoundOp, shape: Shape) -> CompoundOp {
-    fmt_op!(ctx, CompoundOp, compound_op, shape, {
-        PlusEqual = " += ",
-        MinusEqual = " -= ",
-        StarEqual = " *= ",
-        SlashEqual = " /= ",
-        PercentEqual = " %= ",
-        CaretEqual = " ^= ",
-        TwoDotsEqual = " ..= ",
-        DoubleSlashEqual = " //= ",
-    }, |other| panic!("unknown node {:?}", other))
-}
-
-pub fn format_compound_assignment(
-    ctx: &Context,
-    compound_assignment: &CompoundAssignment,
-    shape: Shape,
-) -> CompoundAssignment {
-    // Calculate trivia
-    let leading_trivia = vec![create_indent_trivia(ctx, shape)];
-    let trailing_trivia = vec![create_newline_trivia(ctx)];
-
-    let lhs = format_var(ctx, compound_assignment.lhs(), shape)
-        .update_leading_trivia(FormatTriviaType::Append(leading_trivia));
-    let compound_operator = format_compound_op(ctx, compound_assignment.compound_operator(), shape);
-    let shape = shape
-        + (strip_leading_trivia(&lhs).to_string().len() + compound_operator.to_string().len());
-
-    let rhs = format_expression(ctx, compound_assignment.rhs(), shape)
-        .update_trailing_trivia(FormatTriviaType::Append(trailing_trivia));
-
-    CompoundAssignment::new(lhs, compound_operator, rhs)
-}
 
 // If we have a type like
 // A | B | {
@@ -142,7 +108,7 @@ fn format_type_info_generics(
                     || generic_pair.value().has_leading_comments(CommentSearch::All) // Look for leading multiline comments - these suggest expansion
                     || generic_pair
                         .punctuation()
-                        .map_or(false, contains_singleline_comments)
+                        .is_some_and(contains_singleline_comments)
         });
 
     let should_expand = contains_comments
@@ -1257,7 +1223,7 @@ fn format_type_declaration(
 
     // If there are comments in between the type name and the generics, then handle them
     let (type_name, equal_token, generics) = if type_name.has_trailing_comments(CommentSearch::All)
-        || generics.as_ref().map_or(false, |generics| {
+        || generics.as_ref().is_some_and(|generics| {
             generics
                 .arrows()
                 .tokens()
@@ -1572,4 +1538,15 @@ pub fn format_exported_type_function(
         .to_owned()
         .with_export_token(export_token)
         .with_type_function(type_function)
+}
+
+pub fn format_luau_attribute(
+    ctx: &Context,
+    attribute: &LuauAttribute,
+    shape: Shape,
+) -> LuauAttribute {
+    let at_sign = fmt_symbol!(ctx, attribute.at_sign(), "@", shape);
+    let name = format_token_reference(ctx, attribute.name(), shape);
+
+    attribute.clone().with_at_sign(at_sign).with_name(name)
 }

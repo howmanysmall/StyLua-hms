@@ -1,6 +1,6 @@
 [package]
 name = "stylua"
-version = "2.0.2"
+version = "2.1.0"
 authors = ["JohnnyMorganz <johnnymorganz@outlook.com>"]
 description = "A code formatter for Lua"
 license = "MPL-2.0"
@@ -31,6 +31,7 @@ lua52 = ["full_moon/lua52"]
 lua53 = ["lua52", "full_moon/lua53"]
 lua54 = ["lua53", "full_moon/lua54"]
 luajit = ["full_moon/luajit"]
+cfxlua = ["lua54", "full_moon/cfxlua"]
 editorconfig = ["ec4rs"]
 
 [dependencies]
@@ -38,10 +39,10 @@ anyhow = "1.0.75"
 cfg-if = "1.0.0"
 clap = { version = "3.1.6", features = ["derive"] }
 console = "0.15.7"
-crossbeam-channel = "0.5.8"
+crossbeam-channel = "0.5.15"
 ec4rs = { version = "1.0.2", optional = true }
 env_logger = { version = "0.10.0", default-features = false }
-full_moon = "1.2.0"
+full_moon = "2.0.0"
 globset = "0.4.13"
 ignore = "0.4.20"
 lazy_static = "1.4.0"

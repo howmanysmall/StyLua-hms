@@ -1,9 +1,11 @@
+#[cfg(any(feature = "luau", feature = "cfxlua"))]
+use crate::formatters::compound_assignment::format_compound_assignment;
 #[cfg(feature = "lua52")]
 use crate::formatters::lua52::{format_goto, format_goto_no_trivia, format_label};
 #[cfg(feature = "luau")]
 use crate::formatters::luau::{
-    format_compound_assignment, format_exported_type_declaration, format_exported_type_function,
-    format_type_declaration_stmt, format_type_function_stmt, format_type_specifier,
+    format_exported_type_declaration, format_exported_type_function, format_type_declaration_stmt,
+    format_type_function_stmt, format_type_specifier,
 };
 use crate::{
     context::{create_indent_trivia, create_newline_trivia, Context, FormatNode},
@@ -826,6 +828,8 @@ pub(crate) mod stmt_block {
                         equal,
                         value: format_expression_block(ctx, &value, shape),
                     },
+                    #[cfg(feature = "cfxlua")]
+                    Field::SetConstructor { dot, name } => Field::SetConstructor { dot, name },
                     Field::NoKey(expression) => {
                         Field::NoKey(format_expression_block(ctx, &expression, shape))
                     }
@@ -944,11 +948,9 @@ pub(crate) mod stmt_block {
                 expression: Box::new(format_expression_block(ctx, expression, shape)),
             },
             Expression::Function(anonymous_function) => {
-                let block = format_block(ctx, anonymous_function.1.block(), shape);
-                Expression::Function(Box::new((
-                    anonymous_function.0.to_owned(),
-                    anonymous_function.1.to_owned().with_block(block),
-                )))
+                let block = format_block(ctx, anonymous_function.body().block(), shape);
+                let body = anonymous_function.body().clone().with_block(block);
+                Expression::Function(Box::new(anonymous_function.clone().with_body(body)))
             }
             Expression::FunctionCall(function_call) => {
                 Expression::FunctionCall(format_function_call_block(ctx, function_call, shape))
@@ -1061,7 +1063,7 @@ pub(crate) mod stmt_block {
                 let block = format_block(ctx, while_block.block(), block_shape);
                 Stmt::While(while_block.to_owned().with_block(block))
             }
-            #[cfg(feature = "luau")]
+            #[cfg(any(feature = "luau", feature = "cfxlua"))]
             Stmt::CompoundAssignment(compound_assignment) => {
                 let rhs = format_expression_block(ctx, compound_assignment.rhs(), block_shape);
                 Stmt::CompoundAssignment(compound_assignment.to_owned().with_rhs(rhs))
@@ -1117,7 +1119,7 @@ pub fn format_stmt(ctx: &Context, stmt: &Stmt, shape: Shape) -> Stmt {
         NumericFor = format_numeric_for,
         Repeat = format_repeat_block,
         While = format_while_block,
-        #[cfg(feature = "luau")] CompoundAssignment = format_compound_assignment,
+        #[cfg(any(feature = "luau", feature = "cfxlua"))] CompoundAssignment = format_compound_assignment,
         #[cfg(feature = "luau")] ExportedTypeDeclaration = format_exported_type_declaration,
         #[cfg(feature = "luau")] TypeDeclaration = format_type_declaration_stmt,
         #[cfg(feature = "luau")] ExportedTypeFunction = format_exported_type_function,

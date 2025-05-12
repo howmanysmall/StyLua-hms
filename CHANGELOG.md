@@ -7,13 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fix formatting of index containing brackets string in parentheses ([#992](https://github.com/JohnnyMorganz/StyLua/pull/992))
+
+## [2.1.0] - 2025-04-21
+
 ### Added
 
 - Luau: Added support for parsing user-defined type functions ([#938](https://github.com/JohnnyMorganz/StyLua/issues/938))
+- Luau: Added support for parsing attributes (`@native` / `@deprecated`) on functions
+- Added support for CfxLua (FiveM) syntax formatting. This is available with `syntax = "cfxlua"` ([#855](https://github.com/JohnnyMorganz/StyLua/issues/855))
+- Added a pre-built binary release for `stylua-linux-aarch64-musl.zip`
+- Added error hints on parse failurse when a potential Lua syntax conflict is noticed (e.g., Lua 5.2 vs Luau syntax for labels `::` and generics `>>`) ([#960](https://github.com/JohnnyMorganz/StyLua/issues/960) / [#962](https://github.com/JohnnyMorganz/StyLua/issues/962))
+
+### Changed
+
+- Updated StyLua release GitHub action to `ubuntu-22.04` workers due to GitHub's deprecation of `ubuntu-20.04`. This may mean the pre-built release artifacts published to GitHub no longer work on `ubuntu-20.04` and require a manual build.
 
 ### Fixed
 
 - Luau: fixed parentheses incorrectly removed in `(expr :: assertion) < foo` when multilining the expression, leading to a syntax error ([#940](https://github.com/JohnnyMorganz/StyLua/issues/940))
+- Fixed panic when attempting to format a file outside of the current working directory when `--respect-ignores` is enabled ([#969](https://github.com/JohnnyMorganz/StyLua/pull/969))
+- Fixed unnecessary semicolons being introduced at the end of statements when incorrectly determined as ambiguous ([#963](https://github.com/JohnnyMorganz/StyLua/issues/963))
+- Fixed malformed formatting of function calls where parentheses are removed but there are comments in between the parentheses and the expression. Now, we will keep the parentheses in these cases, except for trailing comments ([#964](https://github.com/JohnnyMorganz/StyLua/issues/964))
+- Fixed malformed formatting of table field expression when there are comments in between the equals and the value ([#942](https://github.com/JohnnyMorganz/StyLua/issues/942))
 
 ## [2.0.2] - 2024-12-07
 
@@ -809,7 +826,8 @@ This feature is enabled by default, it can be disabled using `--no-editorconfig`
 
 Initial alpha release
 
-[unreleased]: https://github.com/JohnnyMorganz/StyLua/compare/v2.0.2...HEAD
+[unreleased]: https://github.com/JohnnyMorganz/StyLua/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/JohnnyMorganz/StyLua/releases/tag/v2.1.0
 [2.0.2]: https://github.com/JohnnyMorganz/StyLua/releases/tag/v2.0.2
 [2.0.1]: https://github.com/JohnnyMorganz/StyLua/releases/tag/v2.0.1
 [2.0.0]: https://github.com/JohnnyMorganz/StyLua/releases/tag/v2.0.0
