@@ -564,7 +564,7 @@ fn format_type_info_internal(
                     format_singleline_table(ctx, braces, fields, format_type_field, shape)
                 }
                 TableType::MultiLine => {
-                    format_multiline_table(ctx, braces, fields, format_type_field, shape)
+                    format_multiline_table(ctx, braces, fields, format_type_field, shape, true)
                 }
             };
 
