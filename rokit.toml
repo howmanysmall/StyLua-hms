@@ -1,0 +1,4 @@
+[tools]
+lunar = "corecii/lunar@0.1.0"
+lune = "lune-org/lune@0.9.3"
+selene = "kampfkarren/selene@0.28.0"
