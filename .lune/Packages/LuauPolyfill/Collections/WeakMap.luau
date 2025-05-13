@@ -15,7 +15,7 @@ type WeakMap_Statics = {
 	new: <K, V>() -> WeakMap<K, V>,
 }
 
-local WeakMap: WeakMapPrivate<any, any> & WeakMap_Statics = {} :: any;
+local WeakMap: WeakMapPrivate<any, any> & WeakMap_Statics = {} :: any
 (WeakMap :: any).__index = WeakMap
 
 function WeakMap.new<K, V>(): WeakMap<K, V>

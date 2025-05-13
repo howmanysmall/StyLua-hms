@@ -35,7 +35,7 @@ local Set: Set<any> & Set_Statics = (
 			return result
 		end;
 	} :: any
-) :: Set<any> & Set_Statics;
+) :: Set<any> & Set_Statics
 (Set :: any).__index = Set
 
 function Set.new<T>(iterable: Array<T> | Set<T> | string | nil): Set<T>

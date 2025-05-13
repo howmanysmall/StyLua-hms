@@ -1655,16 +1655,13 @@ type command = Parser & InMutex
 
 type command_target = Parser & InMutex
 
-type __callPlusType = typeof(setmetatable(
-	{} :: Parser,
-	{} :: {
-		__call: (self: any, {
-			name: string?,
-			description: string?,
-			epilog: string?,
-		}) -> Parser,
-	}
-))
+type __callPlusType = typeof(setmetatable({} :: Parser, {} :: {
+	__call: (self: any, {
+		name: string?,
+		description: string?,
+		epilog: string?,
+	}) -> Parser,
+}))
 
 type Parser = {
 	__index: Parser,
@@ -1720,25 +1717,22 @@ type Parser = {
 	help_description_margin: (self: Parser | __callPlusType, number) -> Parser,
 }
 
-return (argparse :: any) :: typeof(setmetatable(
-	{} :: {
-		version: string,
-	},
-	{} :: {
+return (argparse :: any) :: typeof(setmetatable({} :: {
+	version: string,
+}, {} :: {
+	__call: (
+		self: any,
+		name: string?,
+		description: string?,
+		epilog: string?
+	) -> typeof(setmetatable({} :: Parser, {} :: {
 		__call: (
 			self: any,
-			name: string?,
-			description: string?,
-			epilog: string?
-		) -> typeof(setmetatable(
-			{} :: Parser,
-			{} :: {
-				__call: (self: any, {
-					name: string?,
-					description: string?,
-					epilog: string?,
-				}) -> Parser,
+			{
+				name: string?,
+				description: string?,
+				epilog: string?,
 			}
-		)),
-	}
-))
+		) -> Parser,
+	})),
+}))

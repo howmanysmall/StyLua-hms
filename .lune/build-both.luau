@@ -2,7 +2,7 @@
 --!strict
 --[=[ lunar
 	about = "Validates the existence of custom packages."
-	args = "[-d,--destroy]"
+	args = "[-d, --destroy] [-w64, --windows64]"
 ]=]
 
 local Execute = require("@utilities/Execute")
@@ -39,7 +39,7 @@ end)()
 local ON_WINDOWS = process.os == "windows"
 local TARGET_FOLDER = Path.new("target")
 -- if ON_ARM64 then
--- 	TARGET_FOLDER = TARGET_FOLDER:join(if ON_WINDOWS then "aarch64-pc-windows-msvc" else "aarch64-unknown-linux-gnu")
+-- 	TARGET_FOLDER = TARGET_FOLDER:join(`if ON_WINDOWS then "aarch64-pc-windows-msvc" else "aarch64-unknown-linux-gnu")
 -- end
 
 local RELEASE_FOLDER = TARGET_FOLDER:join("release")
